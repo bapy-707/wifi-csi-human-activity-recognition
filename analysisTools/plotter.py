@@ -48,7 +48,7 @@ def create_radio_buttons(fig):
 ##########################################
 def create_gui(state, features):
     fig = plt.figure(figsize=(14, 9))
-    ax = fig.add_axes([0.28, 0.10, 0.68, 0.82])
+    ax = fig.add_axes([0.28, 0.125, 0.68, 0.82])
     radio = create_radio_buttons(fig)
     play_button = create_play_button(fig)
     packet_slider = create_packet_slider(fig,features["MAG"].shape[0])

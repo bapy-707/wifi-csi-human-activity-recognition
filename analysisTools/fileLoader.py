@@ -1,14 +1,20 @@
-def load_csi(filename):
+def load_csi(filename,debug=False):
     import numpy as np
     I_all = []
     Q_all = []
     with open(filename, "r", errors="ignore") as f:
-        for line in f:
+        for i,line in enumerate(f):
             parts = line.strip().split(",")
+            if debug:
+                print(f"Raw data - [{i}]: {line}")
+                print(f"Splitted - [{i}]: {parts}")
+                print(f"Len - [{i}]: {len(parts)}")
             if len(parts) < 3:
                 continue
             try:
                 vals = np.array(list(map(int, parts[1:])))
+                if debug:
+                    print(f"Values - [{i}]:{vals}")
             except Exception:
                 continue
             if len(vals) % 2:

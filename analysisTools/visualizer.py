@@ -36,6 +36,7 @@ def parse_args():
     parser.add_argument("filename",help="CSI file")
     parser.add_argument("--fs",type=float,default=100.0,help="Sampling frequency (Pkts/Sec)")
     parser.add_argument("--interval",type=int,default=50,help="Animation interval (ms)")
+    parser.add_argument("--debug", action="store_true", help="Print input file for debugging")
     return parser.parse_args()
 ################################################
 def normalize_axis(features):
@@ -51,7 +52,7 @@ def normalize_axis(features):
 ################################################
 def main():
     args = parse_args()
-    csi = load_csi(args.filename)
+    csi = load_csi(args.filename,args.debug)
     #print(csi)
     features = compute_features(*csi)
     features=normalize_axis(features)

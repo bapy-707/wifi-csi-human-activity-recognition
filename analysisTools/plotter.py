@@ -5,6 +5,7 @@ from matplotlib.widgets import Slider
 from matplotlib.widgets import Button
 from dataclasses import dataclass
 from featureExtraction import estimate_velocity
+import numpy as np
 ##########################################
 @dataclass
 class GUI:
@@ -72,13 +73,14 @@ def draw_iq(ax,I,Q,idx,progress):
     ax.set_ylim(-128, 128)
     ax.grid(True)
 ##########################################
-def draw_magnitude(ax,mag,idx,progress):
+def draw_magnitude(ax, mag, idx, progress, ymin, ymax):
     ax.plot(mag)
-    ax.set_title(f"Magnitude Packet {idx} "f"[{progress:.1f}%]")
+    ax.set_ylim(ymin, ymax)
     ax.grid(True)
 ##########################################
 def draw_phase(ax,phase,idx,progress):
     ax.plot(phase)
+    ax.set_ylim(-np.pi, np.pi)
     ax.set_title(f"Phase Packet {idx} " f"[{progress:.1f}%]")
     ax.grid(True)
 ##########################################
@@ -87,16 +89,19 @@ def draw_magnitude_heatmap(ax,MAG,idx):
     ax.imshow(MAG[start:idx+1].T,aspect="auto",origin="lower")
     ax.set_title("Magnitude Heatmap")
 ##########################################
-def draw_motion_metric(ax,metric,idx):
+def draw_motion_metric(ax, metric, idx, ymax=1):
     ax.plot(metric)
     ax.axvline(idx)
     ax.set_title("Motion Metric")
+    ax.set_ylim(0, ymax)
     ax.grid(True)
 ##########################################
-def draw_pca(ax,pca_comp,idx):
+def draw_pca(ax,features,idx):
+    pca_comp=features["pca"]
     ax.plot(pca_comp[:, 0])
     ax.axvline(idx)
     ax.set_title("PCA Component 1")
+    ax.set_ylim(features["pca_min"],features["pca_max"])
     ax.grid(True)
 ##########################################
 def draw_spectrogram(ax,signal,fs):
@@ -128,15 +133,16 @@ def update(frame, state, features, gui):
     if mode == "IQ":
         draw_iq(gui.ax,features["H"][idx].real,features["H"][idx].imag,idx,progress)
     elif mode == "Magnitude":
-        draw_magnitude(gui.ax,features["MAG"][idx],idx,progress)
+        #draw_magnitude(gui.ax,features["MAG"][idx],idx,progress)
+        draw_magnitude(gui.ax,features["MAG"][idx],idx,progress,features["mag_min"],features["mag_max"])
     elif mode == "Phase":
         draw_phase(gui.ax,features["PHASE"][idx],idx,progress)
     elif mode == "MagnitudeHeatmap":
         draw_magnitude_heatmap(gui.ax,features["MAG"],idx)
     elif mode == "MotionMetric":
-        draw_motion_metric(gui.ax,features["motion_metric"],min(idx,len(features["motion_metric"]) - 1))
+        draw_motion_metric(gui.ax,features["motion_metric"],min(idx, len(features["motion_metric"]) - 1),features["motion_max"] * 1.1)
     elif mode == "PCA1":
-        draw_pca(gui.ax,features["pca"],idx)
+        draw_pca(gui.ax,features,idx)
     elif mode == "DopplerSpectrogram":
         draw_spectrogram(gui.ax,features["MAG"][:, state.current_sc],state.fs)
     elif mode == "Velocity":

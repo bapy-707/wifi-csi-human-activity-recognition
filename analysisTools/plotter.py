@@ -123,6 +123,8 @@ def draw_waterfall3d(ax,MAG,idx):
     ax.set_title("3D Waterfall")
 ##########################################
 def update(frame, state, features, gui):
+    if not state.playing:
+        return
     if state.playing:
         state.current_packet = (state.current_packet + 1) % features["MAG"].shape[0]
     idx = state.current_packet
@@ -149,5 +151,7 @@ def update(frame, state, features, gui):
         vel = estimate_velocity(features["PHASE"],state.current_sc,state.fs)
         gui.ax.text(0.2,0.5,f"{vel:.3f} m/s",fontsize=24)
         gui.ax.axis("off")
-    gui.fig.canvas.draw_idle()
+    #gui.fig.canvas.draw_idle()
+    if not state.playing:
+        return
 ##########################################

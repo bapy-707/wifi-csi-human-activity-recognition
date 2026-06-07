@@ -4,6 +4,7 @@ from matplotlib.widgets import RadioButtons
 from matplotlib.widgets import Slider
 from matplotlib.widgets import Button
 from dataclasses import dataclass
+from featureExtraction import estimate_velocity
 ##########################################
 @dataclass
 class GUI:
@@ -41,7 +42,7 @@ def create_radio_buttons(fig):
         "Velocity",
         "Waterfall3D"
     ]
-
+    modes.remove("Waterfall3D")
     rax = fig.add_axes([0.02, 0.30, 0.20, 0.60])
     radio = RadioButtons(rax,modes)
     return radio
@@ -120,6 +121,7 @@ def update(frame, state, features, gui):
     if state.playing:
         state.current_packet = (state.current_packet + 1) % features["MAG"].shape[0]
     idx = state.current_packet
+    gui.ax.set_title(f"{state.current_mode} | Packet {idx}/{features['MAG'].shape[0]-1}")
     progress = (100.0 * idx /max(1, features["MAG"].shape[0] - 1))
     gui.ax.clear()
     mode = state.current_mode

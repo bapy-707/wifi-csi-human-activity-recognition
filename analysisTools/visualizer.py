@@ -43,10 +43,19 @@ def parse_args():
 def main():
     args = parse_args()
     csi = load_csi(args.filename)
-    print(csi)
+    #print(csi)
     features = compute_features(*csi)
-    state = ViewerState()
+    features["pca"] = compute_pca(features["MAG"])
+    state = ViewerState(current_mode="IQ",current_sc=min(20,features["MAG"].shape[1] - 1),current_packet=0,playing=True,fs=args.fs)
     gui = create_gui(state, features)
+
+    # Connect buttons with actions
+    gui.radio.on_clicked(lambda label:setattr(state,"current_mode",label))
+    gui.subcarrier_slider.on_changed(lambda val:setattr(state,"current_sc",int(val)))
+    gui.packet_slider.on_changed(lambda val: setattr(state, "current_packet", int(val)))
+    gui.play_button.on_clicked(lambda event: (setattr(state, "playing", not state.playing), gui.play_button.label.set_text("Pause" if state.playing else "Play")))
+    print(f"Mode={state.current_mode}, Packet={state.current_packet}, SC={state.current_sc}")
+
     anim = FuncAnimation(gui.fig,lambda frame: update(frame,state,features,gui),interval=args.interval,cache_frame_data=False)
     gui.anim = anim
     plt.show()

@@ -8,9 +8,7 @@ def load_csi(filename):
             if len(parts) < 3:
                 continue
             try:
-                vals = np.array(
-                    list(map(int, parts[1:]))
-                )
+                vals = np.array(list(map(int, parts[1:])))
             except Exception:
                 continue
             if len(vals) % 2:
@@ -20,16 +18,8 @@ def load_csi(filename):
             I_all.append(vals[0::2])
             Q_all.append(vals[1::2])
     if not I_all:
-        raise RuntimeError(
-            "No CSI packets found"
-        )
+        raise RuntimeError("No CSI packets found")
     min_sc = min(len(x) for x in I_all)
-
-    I_all = np.array(
-        [x[:min_sc] for x in I_all]
-    )
-
-    Q_all = np.array(
-        [x[:min_sc] for x in Q_all]
-    )
+    I_all = np.array([x[:min_sc] for x in I_all])
+    Q_all = np.array([x[:min_sc] for x in Q_all])
     return(I_all, Q_all)
